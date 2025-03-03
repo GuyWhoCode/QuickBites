@@ -13,21 +13,21 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
       ),
-      home: const NavigationExample(),
+      home: const NavBar(),
     );
   }
 }
 
-class NavigationExample extends StatefulWidget {
-  const NavigationExample({super.key});
+class NavBar extends StatefulWidget {
+  const NavBar({super.key});
 
   @override
-  State<NavigationExample> createState() => _NavigationExampleState();
+  State<NavBar> createState() => _NavBarState();
 }
 
-class _NavigationExampleState extends State<NavigationExample> {
+class _NavBarState extends State<NavBar> {
   int currentPageIndex = 0;
 
   @override
@@ -40,24 +40,23 @@ class _NavigationExampleState extends State<NavigationExample> {
             currentPageIndex = index;
           });
         },
-        indicatorColor: Colors.cyanAccent,
         selectedIndex: currentPageIndex,
         destinations: const <Widget>[
           NavigationDestination(
-            selectedIcon: Icon(Icons.home),
-            icon: Icon(Icons.home_outlined),
+            selectedIcon: const Icon(Icons.home),
+            icon: const Icon(Icons.home_outlined),
             label: 'Home',
           ),
           NavigationDestination(
-            icon: Icon(Icons.search_rounded),
+            icon: const Icon(Icons.search_rounded),
             label: 'Search',
           ),
           NavigationDestination(
-            icon: Badge(child: Icon(Icons.inbox_rounded)),
+            icon: const Badge(child: Icon(Icons.inbox_rounded)),
             label: 'Notifications',
           ),
           NavigationDestination(
-            icon: Icon(Icons.person_2_outlined),
+            icon: const Icon(Icons.person_2_outlined),
             label: 'Account',
           ),
         ],
@@ -69,6 +68,15 @@ class _NavigationExampleState extends State<NavigationExample> {
             NotificationPage(),
             AccountPage(),
           ][currentPageIndex],
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          print("Hello world");
+        },
+        child: const Icon(Icons.add),
+        shape: CircleBorder(),
+        backgroundColor: Colors.redAccent,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }
