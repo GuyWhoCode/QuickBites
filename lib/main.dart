@@ -3,8 +3,15 @@ import './pages/notification/page.dart';
 import './pages/home/page.dart';
 import './pages/account/page.dart';
 import './pages/search/page.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() => runApp(const App());
+
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  runApp(const App());
+}
 
 class App extends StatelessWidget {
   const App({super.key});
