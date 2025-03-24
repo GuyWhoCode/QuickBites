@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import './pages/notification/page.dart';
 import './pages/home/page.dart';
@@ -50,21 +50,21 @@ class _NavBarState extends State<NavBar> {
         selectedIndex: currentPageIndex,
         destinations: const <Widget>[
           NavigationDestination(
-            selectedIcon: const Icon(Icons.home),
-            icon: const Icon(Icons.home_outlined),
-            label: 'Home',
+            selectedIcon: Icon(Icons.home),
+            icon: Icon(Icons.home_outlined),
+            label: '',
           ),
           NavigationDestination(
-            icon: const Icon(Icons.search_rounded),
-            label: 'Search',
+            icon: Icon(Icons.search_rounded),
+            label: '',
           ),
           NavigationDestination(
-            icon: const Badge(child: Icon(Icons.inbox_rounded)),
-            label: 'Notifications',
+            icon: Badge(child: Icon(Icons.inbox_rounded)),
+            label: '',
           ),
           NavigationDestination(
-            icon: const Icon(Icons.person_2_outlined),
-            label: 'Account',
+            icon: Icon(Icons.person_2_outlined),
+            label: '',
           ),
         ],
       ),
@@ -77,22 +77,22 @@ class _NavBarState extends State<NavBar> {
           ][currentPageIndex],
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          var db = FirebaseFirestore.instance;
-          // Create a new user with a first and last name
-          final user = <String, dynamic>{
-            "first": "Ada",
-            "last": "Lovelace",
-            "born": 1815,
-          };
+          // var db = FirebaseFirestore.instance;
+          // // Create a new user with a first and last name
+          // final user = <String, dynamic>{
+          //   "first": "Ada",
+          //   "last": "Lovelace",
+          //   "born": 1815,
+          // };
 
-          // Add a new document with a generated ID
-          db
-              .collection("users")
-              .add(user)
-              .then(
-                (DocumentReference doc) =>
-                    print('DocumentSnapshot added with ID: ${doc.id}'),
-              );
+          // // Add a new document with a generated ID
+          // db
+          //     .collection("users")
+          //     .add(user)
+          //     .then(
+          //       (DocumentReference doc) =>
+          //           print('DocumentSnapshot added with ID: ${doc.id}'),
+          //     );
 
           print("Hello world");
         },
