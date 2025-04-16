@@ -4,6 +4,7 @@ import './pages/notification/page.dart';
 import './pages/home/page.dart';
 import './pages/account/page.dart';
 import './pages/search/page.dart';
+import './pages/login/page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
@@ -54,18 +55,12 @@ class _NavBarState extends State<NavBar> {
             icon: Icon(Icons.home_outlined),
             label: '',
           ),
-          NavigationDestination(
-            icon: Icon(Icons.search_rounded),
-            label: '',
-          ),
+          NavigationDestination(icon: Icon(Icons.search_rounded), label: ''),
           NavigationDestination(
             icon: Badge(child: Icon(Icons.inbox_rounded)),
             label: '',
           ),
-          NavigationDestination(
-            icon: Icon(Icons.person_2_outlined),
-            label: '',
-          ),
+          NavigationDestination(icon: Icon(Icons.person_2_outlined), label: ''),
         ],
       ),
       body:
@@ -73,7 +68,8 @@ class _NavBarState extends State<NavBar> {
             HomePage(),
             SearchPage(),
             NotificationPage(),
-            AccountPage(),
+            AuthPage(),
+            // AccountPage(),
           ][currentPageIndex],
       floatingActionButton: FloatingActionButton(
         onPressed: () {

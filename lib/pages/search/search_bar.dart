@@ -110,8 +110,8 @@ class _RestaurantSearchBarState extends State<RestaurantSearchBar> {
       onSubmitted: (String value) async {
         determinePosition()
             .then((Position position) {
+              print(position == null ? 'Unknown' : '${position.latitude}, ${position.longitude}');
               restaurantAutoCompleteSearch(value, position.latitude, position.longitude);
-              // print(position == null ? 'Unknown' : '${position.latitude}, ${position.longitude}');
             })
             .catchError((e) {
               print(e);
