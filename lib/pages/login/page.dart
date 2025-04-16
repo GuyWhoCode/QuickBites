@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../main.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({Key? key}) : super(key: key);
@@ -59,6 +60,10 @@ class _AuthPageState extends State<AuthPage> {
         print('Sign Up - Email: ${_emailController.text}');
         print('Sign Up - Password: ${_passwordController.text}');
       }
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const NavBar()),
+      );
     }
   }
 

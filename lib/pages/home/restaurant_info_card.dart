@@ -4,12 +4,12 @@ class RestaurantInfoCard extends StatelessWidget {
   final String restaurantName;
   final double distance;
   final String imageUrl;
-  const RestaurantInfoCard({
-    Key? key,
+  RestaurantInfoCard({
+    super.key,
     required this.restaurantName,
     required this.distance,
     required this.imageUrl,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
