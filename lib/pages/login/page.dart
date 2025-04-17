@@ -48,8 +48,6 @@ class _AuthPageState extends State<AuthPage> {
         listen: false,
       );
       if (_isLoginMode) {
-        print('Login - Email: ${_emailController.text}');
-        print('Login - Password: ${_passwordController.text}');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Processing login...'),
@@ -65,11 +63,8 @@ class _AuthPageState extends State<AuthPage> {
               );
           success = await authProvider.login(
             _emailController.text,
-            _passwordController.text,
+            credential.user?.uid ?? 'Guest',
           );
-
-          print('User logged in: ${credential.user?.uid}');
-          print(success);
         } on FirebaseAuthException catch (e) {
           var errorMessage = 'An error occurred. Please try again.';
 
@@ -89,8 +84,6 @@ class _AuthPageState extends State<AuthPage> {
           );
         }
       } else {
-        print('Sign Up - Email: ${_emailController.text}');
-        print('Sign Up - Password: ${_passwordController.text}');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Creating account...'),
@@ -106,10 +99,9 @@ class _AuthPageState extends State<AuthPage> {
               );
           success = await authProvider.login(
             _emailController.text,
-            _passwordController.text,
+            credential.user?.uid ?? 'Guest',
           );
-          print('User created: ${credential.user?.uid}');
-          print(success);
+          print('User ID: ${credential.user}');
         } on FirebaseAuthException catch (e) {
           var errorMessage = 'An error occurred. Please try again.';
 
