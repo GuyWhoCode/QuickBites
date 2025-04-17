@@ -1,13 +1,13 @@
 import './restaurant.dart';
 
-class User {
+class MainUser {
   final String id;
   final String name;
-  Restaurant favoriteRestaurants = [] as Restaurant;
+  List<Restaurant> favoriteRestaurants = [];
 
-  User({
-    required this.id,
-    required this.name,
-    required this.favoriteRestaurants,
-  });
+  MainUser({required this.id, required this.name});
+
+  void addFavoriteRestaurant(Restaurant restaurant) {
+    favoriteRestaurants.add(restaurant);
+  }
 }

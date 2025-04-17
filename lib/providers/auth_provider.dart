@@ -1,19 +1,15 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import '../models/user.dart';
-import '../models/restaurant.dart';
 
-class AuthProvider with ChangeNotifier {
-  User? _currentUser;
+class AuthStateProvider with ChangeNotifier {
+  MainUser? _currentUser;
   bool get isLoggedIn => _currentUser != null;
-  User? get currentUser => _currentUser;
+  MainUser? get currentUser => _currentUser;
 
-  Future<bool> login(String email, String password) async {
+  Future<bool> login(String userName, String userID) async {
     try {
-      _currentUser = User(
-        id: 'user_123',
-        name: 'John Doe',
-        favoriteRestaurants: [] as Restaurant,
-      );
+      _currentUser = MainUser(id: userID, name: userName);
       notifyListeners();
       return true;
     } catch (e) {
@@ -22,7 +18,8 @@ class AuthProvider with ChangeNotifier {
   }
 
   // Logout method
-  void logout() {
+  Future<void> logout() async {
+    await FirebaseAuth.instance.signOut();
     _currentUser = null;
     notifyListeners();
   }

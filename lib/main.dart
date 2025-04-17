@@ -15,7 +15,7 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(
     ChangeNotifierProvider(
-      create: (context) => AuthProvider(),
+      create: (context) => AuthStateProvider(),
       child: const App(),
     ),
   );
@@ -41,7 +41,7 @@ class App extends StatelessWidget {
 class AuthenticationWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final authProvider = context.watch<AuthProvider>();
+    final authProvider = context.watch<AuthStateProvider>();
 
     // You can perform authentication check on startup in the AuthProvider itself
     return authProvider.isLoggedIn ? const NavBar() : const AuthPage();
@@ -60,6 +60,8 @@ class _NavBarState extends State<NavBar> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthStateProvider>();
+
     return Scaffold(
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
@@ -87,7 +89,7 @@ class _NavBarState extends State<NavBar> {
             HomePage(),
             SearchPage(),
             NotificationPage(),
-            AuthPage(),
+            authProvider.isLoggedIn ? AccountPage() : const AuthPage(),
             // AccountPage(),
           ][currentPageIndex],
       floatingActionButton: FloatingActionButton(

@@ -1,8 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:quickbites/providers/auth_provider.dart';
 import '../../main.dart';
 
 class AuthPage extends StatefulWidget {
-  const AuthPage({Key? key}) : super(key: key);
+  const AuthPage({super.key});
 
   @override
   _AuthPageState createState() => _AuthPageState();
@@ -36,34 +39,110 @@ class _AuthPageState extends State<AuthPage> {
     });
   }
 
-  void _submitForm() {
+  void _submitForm() async {
+    bool success = false;
     if (_formKey.currentState!.validate()) {
       // Handle authentication logic based on mode
+      final authProvider = Provider.of<AuthStateProvider>(
+        context,
+        listen: false,
+      );
       if (_isLoginMode) {
-        // Login logic
+        print('Login - Email: ${_emailController.text}');
+        print('Login - Password: ${_passwordController.text}');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Processing login...'),
             backgroundColor: Colors.green,
           ),
         );
-        print('Login - Email: ${_emailController.text}');
-        print('Login - Password: ${_passwordController.text}');
+
+        try {
+          final credential = await FirebaseAuth.instance
+              .signInWithEmailAndPassword(
+                email: _emailController.text,
+                password: _passwordController.text,
+              );
+          success = await authProvider.login(
+            _emailController.text,
+            _passwordController.text,
+          );
+
+          print('User logged in: ${credential.user?.uid}');
+          print(success);
+        } on FirebaseAuthException catch (e) {
+          var errorMessage = 'An error occurred. Please try again.';
+
+          if (e.code == 'user-not-found') {
+            errorMessage = 'No user found for that email.';
+          } else if (e.code == 'wrong-password') {
+            errorMessage = 'Wrong password provided for that user.';
+          } else if (e.code == 'email-already-in-use') {
+            errorMessage = 'The account already exists for that email.';
+          } else if (e.code == 'weak-password') {
+            errorMessage = 'The password provided is too weak.';
+          } else if (e.code == 'invalid-email') {
+            errorMessage = 'The email address is not valid.';
+          }
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
+          );
+        }
       } else {
-        // Sign up logic
+        print('Sign Up - Email: ${_emailController.text}');
+        print('Sign Up - Password: ${_passwordController.text}');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Creating account...'),
             backgroundColor: Colors.green,
           ),
         );
-        print('Sign Up - Email: ${_emailController.text}');
-        print('Sign Up - Password: ${_passwordController.text}');
+
+        try {
+          final credential = await FirebaseAuth.instance
+              .createUserWithEmailAndPassword(
+                email: _emailController.text,
+                password: _passwordController.text,
+              );
+          success = await authProvider.login(
+            _emailController.text,
+            _passwordController.text,
+          );
+          print('User created: ${credential.user?.uid}');
+          print(success);
+        } on FirebaseAuthException catch (e) {
+          var errorMessage = 'An error occurred. Please try again.';
+
+          if (e.code == 'user-not-found') {
+            errorMessage = 'No user found for that email.';
+          } else if (e.code == 'wrong-password') {
+            errorMessage = 'Wrong password provided for that user.';
+          } else if (e.code == 'email-already-in-use') {
+            errorMessage = 'The account already exists for that email.';
+          } else if (e.code == 'weak-password') {
+            errorMessage = 'The password provided is too weak.';
+          } else if (e.code == 'invalid-email') {
+            errorMessage = 'The email address is not valid.';
+          }
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
+          );
+        }
       }
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const NavBar()),
-      );
+
+      if (success) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const NavBar()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Login failed! Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
