@@ -102,7 +102,6 @@ class _RestaurantSearchBarState extends State<RestaurantSearchBar> {
                     String result = await response.stream.bytesToString();
                     var jsonResponse = json.decode(result);
 
-                    print(jsonResponse['suggestions'][0]['placePrediction']);
                     setState(() {
                       searchResults =
                           (jsonResponse['suggestions'] as List?)
