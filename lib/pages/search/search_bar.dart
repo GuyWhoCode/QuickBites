@@ -2,42 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
-restaurantAutoCompleteSearch(String queryValue, double latitude, double longitude) async {
-  var headers = {
-    'Content-Type': 'application/json',
-    'X-Goog-Api-Key': '',
-  };
-  var request = http.Request(
-    'POST',
-    Uri.parse('https://places.googleapis.com/v1/places:autocomplete'),
-  );
-  request.body = json.encode({
-    "input": queryValue,
-    "locationBias": {
-      "circle": {
-        "center": {"latitude": latitude, "longitude": longitude},
-        "radius": 5000.0,
-      },
-    },
-  });
-  request.headers.addAll(headers);
-
-  http.StreamedResponse response = await request.send();
-
-  if (response.statusCode == 200) {
-    String result = await response.stream.bytesToString();
-    print(result);
-    // Parse the JSON response
-    var jsonResponse = json.decode(result);
-    // Do something with the parsed data
-    print(jsonResponse);
-
-    // do something with the result
-  } else {
-    print(response.reasonPhrase);
-  }
-}
+import './result.dart';
 
 Future<Position> determinePosition() async {
   bool serviceEnabled;
@@ -86,6 +51,7 @@ class RestaurantSearchBar extends StatefulWidget {
 
 class _RestaurantSearchBarState extends State<RestaurantSearchBar> {
   late TextEditingController _controller;
+  List<Widget> searchResults = [];
 
   @override
   void initState() {
@@ -94,52 +60,80 @@ class _RestaurantSearchBarState extends State<RestaurantSearchBar> {
   }
 
   @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: _controller,
-      decoration: InputDecoration(
-        hintText: 'Search',
-        prefixIcon: Icon(Icons.search_rounded),
-      ),
-      onSubmitted: (String value) async {
-        determinePosition()
-            .then((Position position) {
-              print(position == null ? 'Unknown' : '${position.latitude}, ${position.longitude}');
-              restaurantAutoCompleteSearch(value, position.latitude, position.longitude);
-            })
-            .catchError((e) {
-              print(e);
-            });
-        // Show a dialog with the input value and its length
+    return Column(
+      children: [
+        TextField(
+          controller: _controller,
+          decoration: InputDecoration(
+            hintText: 'Search',
+            prefixIcon: Icon(Icons.search_rounded),
+          ),
+          onSubmitted: (String value) async {
+            determinePosition()
+                .then((Position position) async {
+                  var headers = {
+                    'Content-Type': 'application/json',
+                    'X-Goog-Api-Key': '',
+                  };
+                  var request = http.Request(
+                    'POST',
+                    Uri.parse(
+                      'https://places.googleapis.com/v1/places:autocomplete',
+                    ),
+                  );
+                  request.body = json.encode({
+                    "input": value,
+                    "locationBias": {
+                      "circle": {
+                        "center": {
+                          "latitude": position.latitude,
+                          "longitude": position.longitude,
+                        },
+                        "radius": 5000.0,
+                      },
+                    },
+                  });
+                  request.headers.addAll(headers);
 
-        
+                  http.StreamedResponse response = await request.send();
 
-        await showDialog<void>(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Thanks!'),
-              content: Text(
-                'You typed "$value", which has length ${value.characters.length}.',
-              ),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
+                  if (response.statusCode == 200) {
+                    String result = await response.stream.bytesToString();
+                    var jsonResponse = json.decode(result);
+
+                    print(jsonResponse['suggestions'][0]['placePrediction']);
+                    setState(() {
+                      searchResults =
+                          (jsonResponse['suggestions'] as List?)
+                              ?.map(
+                                (prediction) => SearchResultBox(
+                                  restaurantName:
+                                      prediction['placePrediction']['structuredFormat']?['mainText']?['text'] ??
+                                      'Unknown',
+                                  address:
+                                      prediction['placePrediction']['structuredFormat']?['secondaryText']?['text'] ??
+                                      'No address',
+                                  placeID: prediction['placeId'] ?? '',
+                                ),
+                              )
+                              .toList() ??
+                          [];
+                    });
+                  }
+                })
+                .catchError((e) {
+                  print(e);
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text('Error: $e')));
+                });
           },
-        );
-      },
+        ),
+        Expanded(child: ListView(children: searchResults)),
+      ],
     );
   }
+
+  // ...existing dispose method...
 }
