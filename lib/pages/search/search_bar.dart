@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:quickbites/env_vars.dart';
 import 'dart:convert';
 import './result.dart';
 
@@ -52,6 +53,7 @@ class RestaurantSearchBar extends StatefulWidget {
 class _RestaurantSearchBarState extends State<RestaurantSearchBar> {
   late TextEditingController _controller;
   List<Widget> searchResults = [];
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -70,20 +72,30 @@ class _RestaurantSearchBarState extends State<RestaurantSearchBar> {
             prefixIcon: Icon(Icons.search_rounded),
           ),
           onSubmitted: (String value) async {
+            setState(() {
+              _isLoading = true;
+              searchResults = [];
+            });
+            // Clear previous results
+
             determinePosition()
                 .then((Position position) async {
+                  print(position.latitude);
+                  print(position.longitude);
                   var headers = {
                     'Content-Type': 'application/json',
-                    'X-Goog-Api-Key': '',
+                    'X-Goog-Api-Key': GOOGLE_API_KEY,
+                    "X-Goog-FieldMask":
+                        "places.displayName,places.formattedAddress,places.photos",
                   };
                   var request = http.Request(
                     'POST',
                     Uri.parse(
-                      'https://places.googleapis.com/v1/places:autocomplete',
+                      'https://places.googleapis.com/v1/places:searchText',
                     ),
                   );
                   request.body = json.encode({
-                    "input": value,
+                    "textQuery": value,
                     "locationBias": {
                       "circle": {
                         "center": {
@@ -93,6 +105,7 @@ class _RestaurantSearchBarState extends State<RestaurantSearchBar> {
                         "radius": 5000.0,
                       },
                     },
+                    "pageSize": 8,
                   });
                   request.headers.addAll(headers);
 
@@ -103,17 +116,19 @@ class _RestaurantSearchBarState extends State<RestaurantSearchBar> {
                     var jsonResponse = json.decode(result);
 
                     setState(() {
+                      _isLoading = false;
                       searchResults =
-                          (jsonResponse['suggestions'] as List?)
+                          (jsonResponse['places'] as List?)
                               ?.map(
                                 (prediction) => SearchResultBox(
                                   restaurantName:
-                                      prediction['placePrediction']['structuredFormat']?['mainText']?['text'] ??
+                                      prediction['displayName']['text'] ??
                                       'Unknown',
                                   address:
-                                      prediction['placePrediction']['structuredFormat']?['secondaryText']?['text'] ??
+                                      prediction['formattedAddress'] ??
                                       'No address',
-                                  placeID: prediction['placeId'] ?? '',
+                                  photoID:
+                                      prediction['photos'][0]['name'] ?? '',
                                 ),
                               )
                               .toList() ??
@@ -129,7 +144,12 @@ class _RestaurantSearchBarState extends State<RestaurantSearchBar> {
                 });
           },
         ),
-        Expanded(child: ListView(children: searchResults)),
+        Expanded(
+          child:
+              _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView(children: searchResults),
+        ),
       ],
     );
   }

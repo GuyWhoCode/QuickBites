@@ -101,7 +101,6 @@ class _AuthPageState extends State<AuthPage> {
             _emailController.text,
             credential.user?.uid ?? 'Guest',
           );
-          print('User ID: ${credential.user}');
         } on FirebaseAuthException catch (e) {
           var errorMessage = 'An error occurred. Please try again.';
 

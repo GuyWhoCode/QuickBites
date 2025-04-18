@@ -32,8 +32,7 @@ class App extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
         useMaterial3: true,
       ),
-      home: const NavBar(),
-      // TODO: home: const AuthenticationWrapper(),
+      home: AuthenticationWrapper(),
     );
   }
 }
@@ -61,6 +60,7 @@ class _NavBarState extends State<NavBar> {
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthStateProvider>();
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
     return Scaffold(
       bottomNavigationBar: NavigationBar(
@@ -92,9 +92,11 @@ class _NavBarState extends State<NavBar> {
             authProvider.isLoggedIn ? AccountPage() : const AuthPage(),
             // AccountPage(),
           ][currentPageIndex],
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // var db = FirebaseFirestore.instance;
+    );
+  }
+}
+
+// var db = FirebaseFirestore.instance;
           // // Create a new user with a first and last name
           // final user = <String, dynamic>{
           //   "first": "Ada",
@@ -110,14 +112,3 @@ class _NavBarState extends State<NavBar> {
           //       (DocumentReference doc) =>
           //           print('DocumentSnapshot added with ID: ${doc.id}'),
           //     );
-
-          print("Hello world");
-        },
-        child: const Icon(Icons.add),
-        shape: CircleBorder(),
-        backgroundColor: Colors.redAccent,
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-    );
-  }
-}
