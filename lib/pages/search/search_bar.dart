@@ -80,8 +80,6 @@ class _RestaurantSearchBarState extends State<RestaurantSearchBar> {
 
             determinePosition()
                 .then((Position position) async {
-                  print(position.latitude);
-                  print(position.longitude);
                   var headers = {
                     'Content-Type': 'application/json',
                     'X-Goog-Api-Key': GOOGLE_API_KEY,

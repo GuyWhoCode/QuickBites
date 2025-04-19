@@ -1,8 +1,9 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:quickbites/env_vars.dart';
+import 'package:provider/provider.dart';
 import 'package:quickbites/image_cache.dart';
+import 'package:quickbites/models/restaurant.dart';
+import 'package:quickbites/pages/login/page.dart';
+import 'package:quickbites/providers/auth_provider.dart';
 
 class SearchResultBox extends StatefulWidget {
   final String restaurantName;
@@ -45,23 +46,30 @@ class _SearchResultBoxState extends State<SearchResultBox> {
                     : TextButton(
                       child: const Text('Add'),
                       onPressed: () async {
-                        // var db = FirebaseFirestore.instance;
-                        // // Create a new user with a first and last name
-                        // final user = <String, dynamic>{
-                        //   "first": "Ada",
-                        //   "last": "Lovelace",
-                        //   "born": 1815,
-                        // };
+                        final authProvider = Provider.of<AuthStateProvider>(
+                          context,
+                          listen:
+                              false, // Use listen: false since this is in an event handler
+                        );
 
-                        // // Add a new document with a generated ID
-                        // db
-                        //     .collection("users")
-                        //     .add(user)
-                        //     .then(
-                        //       (DocumentReference doc) =>
-                        //           print('DocumentSnapshot added with ID: ${doc.id}'),
-                        //     );
-                        print('ADD Pressed');
+                        if (authProvider.currentUser == null) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AuthPage(),
+                            ),
+                          );
+                          return; // Add return to prevent further execution if user is not logged in
+                        }
+
+                        final newRestaurant = Restaurant(
+                          name: widget.restaurantName,
+                          address: widget.address,
+                          photoID: widget.photoID,
+                          addedAt: DateTime.now().millisecondsSinceEpoch,
+                        );
+                        authProvider.addFavoriteRestaurant(newRestaurant);
+
                         await RestaurantImageCache.storeImage(widget.photoID);
                         setState(() {
                           _isAdded = true;

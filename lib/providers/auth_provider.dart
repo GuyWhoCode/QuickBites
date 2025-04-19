@@ -69,4 +69,42 @@ class AuthStateProvider with ChangeNotifier {
     _currentUser = null;
     notifyListeners();
   }
+
+  Future<void> addFavoriteRestaurant(Restaurant restaurant) async {
+    if (_currentUser == null) return;
+    _currentUser!.addFavoriteRestaurant(restaurant);
+    notifyListeners();
+
+    var db = FirebaseFirestore.instance;
+    var userDoc = db.collection("userData").doc(_currentUser!.id);
+    await userDoc.update({
+      "savedRestaurants": FieldValue.arrayUnion([
+        {
+          "name": restaurant.name,
+          "address": restaurant.address,
+          "addedAt": restaurant.addedAt,
+          "photoID": restaurant.photoID,
+        },
+      ]),
+    });
+  }
+
+  Future<void> removeFavoriteRestaurant(Restaurant restaurant) async {
+    if (_currentUser == null) return;
+    _currentUser!.favoriteRestaurants.remove(restaurant);
+    notifyListeners();
+
+    var db = FirebaseFirestore.instance;
+    var userDoc = db.collection("userData").doc(_currentUser!.id);
+    await userDoc.update({
+      "savedRestaurants": FieldValue.arrayRemove([
+        {
+          "name": restaurant.name,
+          "address": restaurant.address,
+          "addedAt": restaurant.addedAt,
+          "photoID": restaurant.photoID,
+        },
+      ]),
+    });
+  }
 }

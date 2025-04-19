@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import './restaurant_info_card.dart';
+import 'package:quickbites/pages/home/restaurant_info_card.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -51,9 +51,7 @@ class HomePage extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(
-            height: 100.0,
-          ),
+          const SizedBox(height: 100.0),
           Align(
             alignment: Alignment.centerLeft,
             child: Text(
@@ -88,7 +86,6 @@ class HomePage extends StatelessWidget {
               ],
             ),
           ),
-          
         ],
       ),
     );

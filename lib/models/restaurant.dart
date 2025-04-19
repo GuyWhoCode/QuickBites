@@ -1,13 +1,13 @@
 class Restaurant {
   final String name;
   final String address;
-  final double reminderDuration;
+  final int addedAt;
   final String photoID;
 
   Restaurant({
     required this.name,
     required this.address,
-    required this.reminderDuration,
+    required this.addedAt,
     required this.photoID,
   });
 
@@ -16,7 +16,7 @@ class Restaurant {
       return Restaurant(
         name: restaurant["name"],
         address: restaurant["address"],
-        reminderDuration: restaurant["reminderDuration"]?.toDouble() ?? 0.0,
+        addedAt: restaurant["reminderDuration"] ?? 0,
         photoID: restaurant["photoID"] ?? "",
       );
     } catch (e) {
