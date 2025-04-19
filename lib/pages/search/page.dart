@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import './search_bar.dart';
+import 'package:quickbites/pages/search/search_bar.dart';
 
 class SearchPage extends StatelessWidget {
   const SearchPage({super.key});

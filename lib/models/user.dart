@@ -1,10 +1,10 @@
-import './restaurant.dart';
+import 'package:quickbites/models/restaurant.dart';
 
 class MainUser {
   final String id;
   final String name;
   List<Restaurant> favoriteRestaurants;
-  final int restaurantReminderDuration;
+  int restaurantReminderDuration;
 
   MainUser({
     required this.id,

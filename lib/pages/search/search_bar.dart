@@ -3,7 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:quickbites/env_vars.dart';
 import 'dart:convert';
-import './result.dart';
+import 'package:quickbites/pages/search/result.dart';
 
 Future<Position> determinePosition() async {
   bool serviceEnabled;

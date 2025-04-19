@@ -22,10 +22,18 @@ class SearchResultBox extends StatefulWidget {
 }
 
 class _SearchResultBoxState extends State<SearchResultBox> {
-  bool _isAdded = false;
-
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthStateProvider>();
+    bool _isAdded = authProvider.checkExistingRestaurant(
+      Restaurant(
+        name: widget.restaurantName,
+        address: widget.address,
+        addedAt: DateTime.now().millisecondsSinceEpoch,
+        photoID: widget.photoID,
+      ),
+    );
+
     return Center(
       child: Card(
         child: Column(
@@ -42,16 +50,16 @@ class _SearchResultBoxState extends State<SearchResultBox> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
                 _isAdded
-                    ? const Icon(Icons.check_circle, color: Colors.green)
+                    ? Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: const Icon(
+                        Icons.check_circle,
+                        color: Colors.green,
+                      ),
+                    )
                     : TextButton(
                       child: const Text('Add'),
                       onPressed: () async {
-                        final authProvider = Provider.of<AuthStateProvider>(
-                          context,
-                          listen:
-                              false, // Use listen: false since this is in an event handler
-                        );
-
                         if (authProvider.currentUser == null) {
                           Navigator.pushReplacement(
                             context,

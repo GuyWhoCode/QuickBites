@@ -46,6 +46,48 @@ class AccountPage extends StatelessWidget {
               child: const Text("Logout"),
             ),
             const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("Reminder Duration: ", style: TextStyle(fontSize: 16)),
+                const SizedBox(width: 8),
+                DropdownButton<int>(
+                  value:
+                      authProvider.currentUser?.restaurantReminderDuration ??
+                      604800000,
+                  items: [
+                    DropdownMenuItem(
+                      value: 432000000, // 5 days in milliseconds
+                      child: Text("5 Days"),
+                    ),
+                    DropdownMenuItem(
+                      value: 604800000, // 7 days in milliseconds
+                      child: Text("Weekly"),
+                    ),
+                    DropdownMenuItem(
+                      value: 1209600000, // 14 days in milliseconds
+                      child: Text("Every 2 Weeks"),
+                    ),
+                    DropdownMenuItem(
+                      value: 1814400000, // 21 days in milliseconds
+                      child: Text("Every 3 Weeks"),
+                    ),
+                    DropdownMenuItem(
+                      value: 2592000000, // 30 days in milliseconds
+                      child: Text("Monthly"),
+                    ),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) {
+                      context.read<AuthStateProvider>().updateReminderDuration(
+                        value,
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
             Text(
               "My Saved Restaurants",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),

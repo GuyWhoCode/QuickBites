@@ -1,14 +1,13 @@
-// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import './pages/notification/page.dart';
-import './pages/home/page.dart';
-import './pages/account/page.dart';
-import './pages/search/page.dart';
-import './pages/login/page.dart';
+import 'package:quickbites/pages/notification/page.dart';
+import 'package:quickbites/pages/home/page.dart';
+import 'package:quickbites/pages/account/page.dart';
+import 'package:quickbites/pages/search/page.dart';
+import 'package:quickbites/pages/login/page.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
-import './providers/auth_provider.dart';
+import 'package:quickbites/firebase_options.dart';
+import 'package:quickbites/providers/auth_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,7 +41,6 @@ class AuthenticationWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthStateProvider>();
 
-    // You can perform authentication check on startup in the AuthProvider itself
     return authProvider.isLoggedIn ? const NavBar() : const AuthPage();
   }
 }

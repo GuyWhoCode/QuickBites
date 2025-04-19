@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:quickbites/image_cache.dart';
 import 'package:quickbites/main.dart';
 import 'package:quickbites/pages/home/restaurant_info_card.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:quickbites/providers/auth_provider.dart';
 
 class HomePage extends StatelessWidget {

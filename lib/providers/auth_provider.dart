@@ -42,11 +42,9 @@ class AuthStateProvider with ChangeNotifier {
         favoriteRestaurants: restaurants,
       );
 
-      print("Current user restaurants: ${_currentUser?.favoriteRestaurants}");
       notifyListeners();
       return true;
     } catch (e) {
-      print("Error logging in: $e");
       return false;
     }
   }
@@ -68,7 +66,6 @@ class AuthStateProvider with ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      print("Error creating account: $e");
       return false;
     }
   }
@@ -116,5 +113,53 @@ class AuthStateProvider with ChangeNotifier {
         },
       ]),
     });
+  }
+
+  bool checkExistingRestaurant(Restaurant restaurant) {
+    if (_currentUser == null) return false;
+    return _currentUser!.favoriteRestaurants.any(
+      (existingRestaurant) =>
+          existingRestaurant.name == restaurant.name &&
+          existingRestaurant.address == restaurant.address,
+    );
+  }
+
+  Future<void> updateReminderDuration(int duration) async {
+    if (_currentUser == null) return;
+
+    _currentUser!.restaurantReminderDuration = duration;
+    notifyListeners();
+
+    var db = FirebaseFirestore.instance;
+    var userDoc = db.collection("userData").doc(_currentUser!.id);
+    await userDoc.update({"restaurantReminderDuration": duration});
+  }
+
+  Future<void> updateRestaurantTimestamp(Restaurant restaurant) async {
+    if (_currentUser == null) return;
+
+    final index = _currentUser!.favoriteRestaurants.indexWhere(
+      (r) => r.name == restaurant.name && r.address == restaurant.address,
+    );
+
+    if (index != -1) {
+      _currentUser!.favoriteRestaurants[index] = restaurant;
+      notifyListeners();
+
+      var db = FirebaseFirestore.instance;
+      await db.collection("userData").doc(_currentUser!.id).update({
+        "savedRestaurants":
+            _currentUser!.favoriteRestaurants
+                .map(
+                  (r) => {
+                    "name": r.name,
+                    "address": r.address,
+                    "addedAt": r.addedAt,
+                    "photoID": r.photoID,
+                  },
+                )
+                .toList(),
+      });
+    }
   }
 }
