@@ -46,6 +46,10 @@ class AccountPage extends StatelessWidget {
               child: const Text("Logout"),
             ),
             const SizedBox(height: 16),
+            Text(
+              "My Saved Restaurants",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
             Expanded(
               child:
                   authProvider.currentUser?.favoriteRestaurants.isEmpty ?? true
@@ -84,6 +88,17 @@ class AccountPage extends StatelessWidget {
                                         : const Icon(Icons.restaurant),
                                 title: Text(restaurant.name),
                                 subtitle: Text(restaurant.address),
+                                trailing: IconButton(
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  ),
+                                  onPressed: () {
+                                    context
+                                        .read<AuthStateProvider>()
+                                        .removeFavoriteRestaurant(restaurant);
+                                  },
+                                ),
                               );
                             },
                           );
