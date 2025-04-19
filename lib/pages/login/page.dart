@@ -97,7 +97,7 @@ class _AuthPageState extends State<AuthPage> {
                 email: _emailController.text,
                 password: _passwordController.text,
               );
-          success = await authProvider.login(
+          success = await authProvider.createAccount(
             _emailController.text,
             credential.user?.uid ?? 'Guest',
           );

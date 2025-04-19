@@ -41,20 +41,33 @@ class _SearchResultBoxState extends State<SearchResultBox> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
                 _isAdded
-                    ? const Icon(
-                        Icons.check_circle,
-                        color: Colors.green,
-                      )
+                    ? const Icon(Icons.check_circle, color: Colors.green)
                     : TextButton(
-                        child: const Text('Add'),
-                        onPressed: () async {
-                          print('ADD Pressed');
-                          await RestaurantImageCache.storeImage(widget.photoID);
-                          setState(() {
-                            _isAdded = true;
-                          });
-                        },
-                      ),
+                      child: const Text('Add'),
+                      onPressed: () async {
+                        // var db = FirebaseFirestore.instance;
+                        // // Create a new user with a first and last name
+                        // final user = <String, dynamic>{
+                        //   "first": "Ada",
+                        //   "last": "Lovelace",
+                        //   "born": 1815,
+                        // };
+
+                        // // Add a new document with a generated ID
+                        // db
+                        //     .collection("users")
+                        //     .add(user)
+                        //     .then(
+                        //       (DocumentReference doc) =>
+                        //           print('DocumentSnapshot added with ID: ${doc.id}'),
+                        //     );
+                        print('ADD Pressed');
+                        await RestaurantImageCache.storeImage(widget.photoID);
+                        setState(() {
+                          _isAdded = true;
+                        });
+                      },
+                    ),
               ],
             ),
           ],
