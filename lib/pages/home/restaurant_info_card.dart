@@ -1,14 +1,15 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 
 class RestaurantInfoCard extends StatelessWidget {
   final String restaurantName;
-  final double distance;
-  final String imageUrl;
+  final String address;
+  final File? imageFile;
   RestaurantInfoCard({
     super.key,
     required this.restaurantName,
-    required this.distance,
-    required this.imageUrl,
+    required this.address,
+    required this.imageFile,
   });
 
   @override
@@ -17,14 +18,20 @@ class RestaurantInfoCard extends StatelessWidget {
       color: Colors.white70,
       child: Column(
         children: <Widget>[
-          Image(
-            image: NetworkImage(imageUrl),
-            height: 200.0,
-            width: 200.0,
-            fit: BoxFit.contain,
-          ),
-          Text(restaurantName),
-          Text("$distance miles away"),
+          const SizedBox(height: 16),
+          imageFile != null
+              ? SizedBox(
+                width: 200,
+                height: 200,
+                child: Image.file(imageFile!, fit: BoxFit.cover),
+              )
+              : const SizedBox(
+                width: 200,
+                height: 200,
+                child: Icon(Icons.restaurant),
+              ),
+          Text(restaurantName, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          Text(address),
         ],
       ),
     );

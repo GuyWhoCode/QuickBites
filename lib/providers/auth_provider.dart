@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:quickbites/models/restaurant.dart';
-import '../models/user.dart';
+import 'package:quickbites/models/user.dart';
 
 class AuthStateProvider with ChangeNotifier {
   MainUser? _currentUser;
@@ -18,21 +18,31 @@ class AuthStateProvider with ChangeNotifier {
       }
       var userData = userDoc.data()!;
 
+      // Convert restaurants synchronously
+      List<Restaurant> restaurants = [];
+      final savedRestaurants = userData["savedRestaurants"] as List?;
+      if (savedRestaurants != null) {
+        for (var restaurant in savedRestaurants) {
+          try {
+            final restaurantData = restaurant as Map<String, dynamic>;
+            final convertedRestaurant = Restaurant.fromMap(restaurantData);
+            if (convertedRestaurant != null) {
+              restaurants.add(convertedRestaurant);
+            }
+          } catch (e) {
+            print("Error converting restaurant data: $e");
+          }
+        }
+      }
+
       _currentUser = MainUser(
         id: userID,
         name: userName,
         restaurantReminderDuration: userData["restaurantReminderDuration"],
-        favoriteRestaurants:
-            (userData["savedRestaurants"] as List)
-                .map((restaurant) => Restaurant.fromMap(restaurant))
-                .whereType<Restaurant>()
-                .toList(),
+        favoriteRestaurants: restaurants,
       );
-      _currentUser = MainUser(
-        id: userID,
-        name: userName,
-        restaurantReminderDuration: 604800000, // 7 days in milliseconds
-      );
+
+      print("Current user restaurants: ${_currentUser?.favoriteRestaurants}");
       notifyListeners();
       return true;
     } catch (e) {

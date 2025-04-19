@@ -11,12 +11,12 @@ class Restaurant {
     required this.photoID,
   });
 
-  static Future<Restaurant?> fromMap(restaurant) async {
+  static Restaurant? fromMap(Map<String, dynamic> restaurant) {
     try {
       return Restaurant(
         name: restaurant["name"],
         address: restaurant["address"],
-        addedAt: restaurant["reminderDuration"] ?? 0,
+        addedAt: restaurant["addedAt"] ?? 0,
         photoID: restaurant["photoID"] ?? "",
       );
     } catch (e) {
