@@ -52,10 +52,8 @@ class AccountPage extends StatelessWidget {
                 Text("Reminder Duration: ", style: TextStyle(fontSize: 16)),
                 const SizedBox(width: 8),
                 DropdownButton<int>(
-                  value:
-                      authProvider.currentUser?.restaurantReminderDuration ??
-                      604800000,
-                  items: [
+                  value: authProvider.currentUser?.restaurantReminderDuration ?? 604800000,
+                  items: const [
                     DropdownMenuItem(
                       value: 432000000, // 5 days in milliseconds
                       child: Text("5 Days"),
@@ -79,9 +77,7 @@ class AccountPage extends StatelessWidget {
                   ],
                   onChanged: (value) {
                     if (value != null) {
-                      context.read<AuthStateProvider>().updateReminderDuration(
-                        value,
-                      );
+                      context.read<AuthStateProvider>().updateReminderDuration(value);
                     }
                   },
                 ),
