@@ -151,7 +151,7 @@ class _AuthPageState extends State<AuthPage> {
               children: [
                 // Header Text
                 Text(
-                  _isLoginMode ? 'Sign In' : 'Create Account',
+                  _isLoginMode ? 'Sign In to QuickBites' : 'Create Account',
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 28,
