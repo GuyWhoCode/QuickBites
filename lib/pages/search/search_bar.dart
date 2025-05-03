@@ -5,17 +5,14 @@ import 'package:quickbites/env_vars.dart';
 import 'dart:convert';
 import 'package:quickbites/pages/search/result.dart';
 
-Future<Position> determinePosition() async {
+Future<Position?> determinePosition() async {
   bool serviceEnabled;
   LocationPermission permission;
 
   // Test if location services are enabled.
   serviceEnabled = await Geolocator.isLocationServiceEnabled();
   if (!serviceEnabled) {
-    // Location services are not enabled don't continue
-    // accessing the position and request users of the
-    // App to enable the location services.
-    return Future.error('Location services are disabled.');
+    return null;
   }
 
   permission = await Geolocator.checkPermission();
@@ -27,15 +24,13 @@ Future<Position> determinePosition() async {
       // Android's shouldShowRequestPermissionRationale
       // returned true. According to Android guidelines
       // your App should show an explanatory UI now.
-      return Future.error('Location permissions are denied');
+      return null;
     }
   }
 
   if (permission == LocationPermission.deniedForever) {
     // Permissions are denied forever, handle appropriately.
-    return Future.error(
-      'Location permissions are permanently denied, we cannot request permissions.',
-    );
+    return null;
   }
 
   // When we reach here, permissions are granted and we can
@@ -54,11 +49,29 @@ class _RestaurantSearchBarState extends State<RestaurantSearchBar> {
   late TextEditingController _controller;
   List<Widget> searchResults = [];
   bool _isLoading = false;
+  bool hasLocationPermission = false;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController();
+    _checkLocationPermission();
+  }
+
+  Future<void> _checkLocationPermission() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      setState(() => hasLocationPermission = false);
+      return;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      setState(() => hasLocationPermission = false);
+    } else {
+      setState(() => hasLocationPermission = true);
+    }
   }
 
   @override
@@ -76,72 +89,85 @@ class _RestaurantSearchBarState extends State<RestaurantSearchBar> {
               _isLoading = true;
               searchResults = [];
             });
-            // Clear previous results
 
-            determinePosition()
-                .then((Position position) async {
-                  var headers = {
-                    'Content-Type': 'application/json',
-                    'X-Goog-Api-Key': GOOGLE_API_KEY,
-                    "X-Goog-FieldMask":
-                        "places.displayName,places.formattedAddress,places.photos",
-                  };
-                  var request = http.Request(
-                    'POST',
-                    Uri.parse(
-                      'https://places.googleapis.com/v1/places:searchText',
-                    ),
-                  );
-                  request.body = json.encode({
-                    "textQuery": value,
-                    "locationBias": {
-                      "circle": {
-                        "center": {
-                          "latitude": position.latitude,
-                          "longitude": position.longitude,
-                        },
-                        "radius": 5000.0,
-                      },
+            final position = await determinePosition();
+            var headers = {
+              'Content-Type': 'application/json',
+              'X-Goog-Api-Key': GOOGLE_API_KEY,
+              "X-Goog-FieldMask":
+                  "places.displayName,places.formattedAddress,places.photos",
+            };
+
+            var request = http.Request(
+              'POST',
+              Uri.parse('https://places.googleapis.com/v1/places:searchText'),
+            );
+
+            if (position == null) {
+              request.body = json.encode({"textQuery": value, "pageSize": 8});
+            } else {
+              request.body = json.encode({
+                "textQuery": value,
+                "locationBias": {
+                  "circle": {
+                    "center": {
+                      "latitude": position.latitude,
+                      "longitude": position.longitude,
                     },
-                    "pageSize": 8,
-                  });
-                  request.headers.addAll(headers);
+                    "radius": 5000.0,
+                  },
+                },
+                "pageSize": 8,
+              });
+            }
 
-                  http.StreamedResponse response = await request.send();
+            request.headers.addAll(headers);
 
-                  if (response.statusCode == 200) {
-                    String result = await response.stream.bytesToString();
-                    var jsonResponse = json.decode(result);
+            final response = await request.send();
 
-                    setState(() {
-                      _isLoading = false;
-                      searchResults =
-                          (jsonResponse['places'] as List?)
-                              ?.map(
-                                (prediction) => SearchResultBox(
-                                  restaurantName:
-                                      prediction['displayName']['text'] ??
-                                      'Unknown',
-                                  address:
-                                      prediction['formattedAddress'] ??
-                                      'No address',
-                                  photoID:
-                                      prediction['photos'][0]['name'] ?? '',
-                                ),
-                              )
-                              .toList() ??
-                          [];
-                    });
-                  }
-                })
-                .catchError((e) {
-                  print(e);
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text('Error: $e')));
-                });
+            if (response.statusCode == 200) {
+              String result = await response.stream.bytesToString();
+              var jsonResponse = json.decode(result);
+
+              setState(() {
+                _isLoading = false;
+                searchResults =
+                    (jsonResponse['places'] as List?)
+                        ?.map(
+                          (prediction) => SearchResultBox(
+                            restaurantName:
+                                prediction['displayName']['text'] ?? 'Unknown',
+                            address:
+                                prediction['formattedAddress'] ?? 'No address',
+                            photoID: prediction['photos'][0]['name'] ?? '',
+                          ),
+                        )
+                        .toList() ??
+                    [];
+              });
+            }
           },
         ),
+        hasLocationPermission
+            ? const SizedBox(height: 10)
+            : Column(
+              children: [
+                const Text(
+                  'Location services are disabled. Please enable them to get better results.',
+                  style: TextStyle(color: Colors.red),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                TextButton.icon(
+                  onPressed: () async {
+                    await Geolocator.openLocationSettings();
+                    await _checkLocationPermission();
+                  },
+                  icon: const Icon(Icons.location_on),
+                  label: const Text('Enable Location Services'),
+                ),
+              ],
+            ),
         Expanded(
           child:
               _isLoading
