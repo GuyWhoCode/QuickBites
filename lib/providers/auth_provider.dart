@@ -70,7 +70,14 @@ class AuthStateProvider with ChangeNotifier {
     }
   }
 
-  // Logout method
+  Future<void> deleteAccount() async {
+    if (_currentUser == null) return;
+    var db = FirebaseFirestore.instance;
+    await db.collection("userData").doc(_currentUser!.id).delete();
+    _currentUser = null;
+    notifyListeners();
+  }
+
   Future<void> logout() async {
     await FirebaseAuth.instance.signOut();
     _currentUser = null;

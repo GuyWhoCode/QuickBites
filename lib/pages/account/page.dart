@@ -31,19 +31,39 @@ class AccountPage extends StatelessWidget {
             const Icon(Icons.account_circle, size: 100, color: Colors.grey),
             const SizedBox(height: 16),
             const Text(
-              "Account",
+              "My Account",
               style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                authProvider.logout();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AuthPage()),
-                );
-              },
-              child: const Text("Logout"),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    authProvider.logout();
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const AuthPage()),
+                    );
+                  },
+                  child: const Text("Logout"),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: () {
+                    authProvider.deleteAccount();
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const AuthPage()),
+                    );
+                  },
+                  child: const Text("Delete Account"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
             Row(
@@ -52,7 +72,9 @@ class AccountPage extends StatelessWidget {
                 Text("Reminder Duration: ", style: TextStyle(fontSize: 16)),
                 const SizedBox(width: 8),
                 DropdownButton<int>(
-                  value: authProvider.currentUser?.restaurantReminderDuration ?? 604800000,
+                  value:
+                      authProvider.currentUser?.restaurantReminderDuration ??
+                      604800000,
                   items: const [
                     DropdownMenuItem(
                       value: 432000000, // 5 days in milliseconds
@@ -77,7 +99,9 @@ class AccountPage extends StatelessWidget {
                   ],
                   onChanged: (value) {
                     if (value != null) {
-                      context.read<AuthStateProvider>().updateReminderDuration(value);
+                      context.read<AuthStateProvider>().updateReminderDuration(
+                        value,
+                      );
                     }
                   },
                 ),
