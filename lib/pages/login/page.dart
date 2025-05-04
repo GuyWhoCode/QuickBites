@@ -149,9 +149,13 @@ class _AuthPageState extends State<AuthPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Header Text
+                // App Logo
+                const Image(
+                  image: AssetImage('assets/icon/icon.png'),
+                  height: 125,
+                ),
                 Text(
-                  _isLoginMode ? 'Sign In to QuickBites' : 'Create Account',
+                  _isLoginMode ? 'QuickBites Login' : 'Create Account',
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 28,

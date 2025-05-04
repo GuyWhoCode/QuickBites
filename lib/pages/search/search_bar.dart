@@ -119,6 +119,9 @@ class _RestaurantSearchBarState extends State<RestaurantSearchBar> {
                 },
                 "pageSize": 8,
               });
+              setState(() {
+                hasLocationPermission = true;
+              });
             }
 
             request.headers.addAll(headers);
