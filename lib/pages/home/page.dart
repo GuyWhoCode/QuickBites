@@ -23,69 +23,74 @@ class HomePage extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.fromLTRB(8.0, 50.0, 8.0, 0.0),
       child: Scaffold(
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Align(
-                alignment: Alignment.center,
-                child: Text(
-                  "Quick Bites",
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                ),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      "Quick Bites",
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const Text(
+                    "Favorite Restaurants",
+                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
+                  ),
+                ],
               ),
-              const Text(
-                "Favorite Restaurants",
-                style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                height: 300,
-                child:
-                    authProvider.currentUser?.favoriteRestaurants.isEmpty ??
-                            true
-                        ? const Center(child: Text('No restaurants added yet!'))
-                        : ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount:
+            ),
+            Expanded(
+              child:
+                  authProvider.currentUser?.favoriteRestaurants.isEmpty ?? true
+                      ? const Center(child: Text('No restaurants added yet!'))
+                      : ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount:
+                            authProvider
+                                .currentUser
+                                ?.favoriteRestaurants
+                                .length ??
+                            0,
+                        itemBuilder: (context, index) {
+                          final restaurant =
                               authProvider
-                                  .currentUser
-                                  ?.favoriteRestaurants
-                                  .length ??
-                              0,
-                          itemBuilder: (context, index) {
-                            final restaurant =
-                                authProvider
-                                    .currentUser!
-                                    .favoriteRestaurants[index];
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 16),
-                              child: FutureBuilder<File?>(
-                                future: RestaurantImageCache.getImage(
-                                  restaurant.photoID,
-                                ),
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return const Center(
-                                      child: CircularProgressIndicator(),
-                                    );
-                                  }
-
-                                  return RestaurantInfoCard(
-                                    restaurantName: restaurant.name,
-                                    address: restaurant.address,
-                                    imageFile: snapshot.data,
-                                  );
-                                },
+                                  .currentUser!
+                                  .favoriteRestaurants[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: FutureBuilder<File?>(
+                              future: RestaurantImageCache.getImage(
+                                restaurant.photoID,
                               ),
-                            );
-                          },
-                        ),
-              ),
-            ],
-          ),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }
+
+                                return RestaurantInfoCard(
+                                  restaurantName: restaurant.name,
+                                  address: restaurant.address,
+                                  imageFile: snapshot.data,
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      ),
+            ),
+          ],
         ),
       ),
     );
