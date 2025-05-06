@@ -120,7 +120,16 @@ class AccountPage extends StatelessWidget {
                   onChanged: (value) async {
                     if (value == -1) {
                       // Show dialog for custom duration
-                      final textFieldController = TextEditingController();
+                      final textFieldController = TextEditingController(
+                        text:
+                            ((authProvider
+                                            .currentUser
+                                            ?.restaurantReminderDuration ??
+                                        604800000) /
+                                    (24 * 60 * 60 * 1000))
+                                .round()
+                                .toString(),
+                      );
                       final result = await showDialog<int>(
                         context: context,
                         builder:
