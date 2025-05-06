@@ -83,6 +83,8 @@ class HomePage extends StatelessWidget {
                                   restaurantName: restaurant.name,
                                   address: restaurant.address,
                                   imageFile: snapshot.data,
+                                  lastEatenTimestamp:
+                                      restaurant.addedAt,
                                 );
                               },
                             ),
