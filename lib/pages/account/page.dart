@@ -73,32 +73,107 @@ class AccountPage extends StatelessWidget {
                 const SizedBox(width: 8),
                 DropdownButton<int>(
                   value:
-                      authProvider.currentUser?.restaurantReminderDuration ??
-                      604800000,
-                  items: const [
-                    DropdownMenuItem(
+                      authProvider.currentUser?.restaurantReminderDuration !=
+                                  null &&
+                              ![
+                                432000000,
+                                604800000,
+                                1209600000,
+                                1814400000,
+                                2592000000,
+                              ].contains(
+                                authProvider
+                                    .currentUser
+                                    ?.restaurantReminderDuration,
+                              )
+                          ? -1 // Set to custom if current duration doesn't match preset values
+                          : authProvider
+                                  .currentUser
+                                  ?.restaurantReminderDuration ??
+                              604800000,
+                  items: [
+                    const DropdownMenuItem(
                       value: 432000000, // 5 days in milliseconds
                       child: Text("5 Days"),
                     ),
-                    DropdownMenuItem(
+                    const DropdownMenuItem(
                       value: 604800000, // 7 days in milliseconds
                       child: Text("Weekly"),
                     ),
-                    DropdownMenuItem(
+                    const DropdownMenuItem(
                       value: 1209600000, // 14 days in milliseconds
                       child: Text("Every 2 Weeks"),
                     ),
-                    DropdownMenuItem(
+                    const DropdownMenuItem(
                       value: 1814400000, // 21 days in milliseconds
                       child: Text("Every 3 Weeks"),
                     ),
-                    DropdownMenuItem(
+                    const DropdownMenuItem(
                       value: 2592000000, // 30 days in milliseconds
                       child: Text("Monthly"),
                     ),
+                    const DropdownMenuItem(
+                      value: -1, // Special value for custom duration
+                      child: Text("Custom..."),
+                    ),
                   ],
-                  onChanged: (value) {
-                    if (value != null) {
+                  onChanged: (value) async {
+                    if (value == -1) {
+                      // Show dialog for custom duration
+                      final textFieldController = TextEditingController();
+                      final result = await showDialog<int>(
+                        context: context,
+                        builder:
+                            (context) => AlertDialog(
+                              title: const Text('Custom Duration'),
+                              content: TextField(
+                                controller: textFieldController,
+                                keyboardType: TextInputType.number,
+                                decoration: const InputDecoration(
+                                  labelText: 'Number of days',
+                                  hintText: 'Enter number of days',
+                                ),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    final days = int.tryParse(
+                                      textFieldController.text,
+                                    );
+
+                                    if (days != null) {
+                                      final duration =
+                                          days * 24 * 60 * 60 * 1000;
+                                      context
+                                          .read<AuthStateProvider>()
+                                          .updateReminderDuration(duration);
+                                      Navigator.of(context).pop(duration);
+                                    } else {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('Invalid input!'),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  child: const Text('Submit'),
+                                ),
+                              ],
+                            ),
+                      );
+
+                      if (result != null) {
+                        context
+                            .read<AuthStateProvider>()
+                            .updateReminderDuration(result);
+                      }
+                    } else if (value != null) {
                       context.read<AuthStateProvider>().updateReminderDuration(
                         value,
                       );
@@ -107,6 +182,7 @@ class AccountPage extends StatelessWidget {
                 ),
               ],
             ),
+            // ...existing code...,
             const SizedBox(height: 16),
             Text(
               "My Saved Restaurants",
