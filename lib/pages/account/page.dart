@@ -153,23 +153,25 @@ class AccountPage extends StatelessWidget {
                                     final days = int.tryParse(
                                       textFieldController.text,
                                     );
-
-                                    if (days != null) {
-                                      final duration =
-                                          days * 24 * 60 * 60 * 1000;
-                                      context
-                                          .read<AuthStateProvider>()
-                                          .updateReminderDuration(duration);
-                                      Navigator.of(context).pop(duration);
-                                    } else {
+                                    if (days == null || days < 1 || days > 30) {
                                       ScaffoldMessenger.of(
                                         context,
                                       ).showSnackBar(
                                         const SnackBar(
-                                          content: Text('Invalid input!'),
+                                          content: Text(
+                                            'Please enter a number between 1 and 30 days',
+                                          ),
+                                          backgroundColor: Colors.red,
                                         ),
                                       );
+                                      return;
                                     }
+
+                                    final duration = days * 24 * 60 * 60 * 1000;
+                                    context
+                                        .read<AuthStateProvider>()
+                                        .updateReminderDuration(duration);
+                                    Navigator.of(context).pop(duration);
                                   },
                                   child: const Text('Submit'),
                                 ),
