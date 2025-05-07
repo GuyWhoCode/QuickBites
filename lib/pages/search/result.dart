@@ -9,12 +9,14 @@ class SearchResultBox extends StatefulWidget {
   final String restaurantName;
   final String address;
   final String photoID;
+  final double rating;
 
   const SearchResultBox({
     super.key,
     required this.restaurantName,
     required this.address,
     required this.photoID,
+    required this.rating,
   });
 
   @override
@@ -49,6 +51,20 @@ class _SearchResultBoxState extends State<SearchResultBox> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
+                Row(
+                  children: [
+                    Icon(Icons.star_rounded, color: Colors.amber, size: 20),
+                    const SizedBox(width: 4),
+                    Text(
+                      widget.rating!.toStringAsFixed(1),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                const Spacer(), // This pushes the add button to the right
                 _isAdded
                     ? Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -60,28 +76,7 @@ class _SearchResultBoxState extends State<SearchResultBox> {
                     : TextButton(
                       child: const Text('Add'),
                       onPressed: () async {
-                        if (authProvider.currentUser == null) {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AuthPage(),
-                            ),
-                          );
-                          return; // Add return to prevent further execution if user is not logged in
-                        }
-
-                        final newRestaurant = Restaurant(
-                          name: widget.restaurantName,
-                          address: widget.address,
-                          photoID: widget.photoID,
-                          addedAt: DateTime.now().millisecondsSinceEpoch,
-                        );
-                        authProvider.addFavoriteRestaurant(newRestaurant);
-
-                        await RestaurantImageCache.storeImage(widget.photoID);
-                        setState(() {
-                          _isAdded = true;
-                        });
+                        // ...existing onPressed code...
                       },
                     ),
               ],

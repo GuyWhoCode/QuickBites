@@ -95,7 +95,7 @@ class _RestaurantSearchBarState extends State<RestaurantSearchBar> {
               'Content-Type': 'application/json',
               'X-Goog-Api-Key': GOOGLE_API_KEY,
               "X-Goog-FieldMask":
-                  "places.displayName,places.formattedAddress,places.photos",
+                  "places.displayName,places.formattedAddress,places.photos,places.rating",
             };
 
             var request = http.Request(
@@ -143,6 +143,10 @@ class _RestaurantSearchBarState extends State<RestaurantSearchBar> {
                             address:
                                 prediction['formattedAddress'] ?? 'No address',
                             photoID: prediction['photos'][0]['name'] ?? '',
+                            rating:
+                                prediction['rating'] != null
+                                    ? (prediction['rating'] as num).toDouble()
+                                    : 0.0,
                           ),
                         )
                         .toList() ??
